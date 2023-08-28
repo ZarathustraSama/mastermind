@@ -9,6 +9,7 @@ class Mastermind
 
   def initialize
     @code = []
+    @turns = TURNS
   end
 
   def choose_code
@@ -18,7 +19,11 @@ class Mastermind
   end
 
   def game_over?(code_guess)
-    code_guess == @code || TURNS.zero?
+    code_guess == @code || @turns.zero?
+  end
+
+  def advance_turn
+    @turns -= 1
   end
 end
 
