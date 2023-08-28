@@ -17,8 +17,8 @@ class Mastermind
     end
   end
 
-  def game_over?(code, code_guess)
-    code_guess == code || TURNS.zero?
+  def game_over?(code_guess)
+    code_guess == @code || TURNS.zero?
   end
 end
 
