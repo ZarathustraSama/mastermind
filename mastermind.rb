@@ -1,18 +1,12 @@
 # frozen_string_literal: true
 
 COLORS = %w[red green blue yellow white purple].freeze
+TURNS = 12
 
-# The structure of the game
+# The structure and logic of the game
 class Mastermind
-  attr_accessor :code, :turns
-
-  def initialize(code)
-    @code = code
-    @turns = 12
-  end
-
-  def game_over?(code_guess)
-    code_guess == @code || @turns.zero?
+  def game_over?(code, code_guess)
+    code_guess == code || TURNS.zero?
   end
 end
 
