@@ -50,10 +50,10 @@ class Mastermind
   def update_pins(color, index, code_guess, tmp_code, pins)
     if code_guess[index] == tmp_code[index]
       pins << 'Yes'
-      tmp_code.remove(tmp_code[index])
+      tmp_code - [code_guess[index]]
     elsif tmp_code.include?(color)
       pins << 'Kinda'
-      tmp_code.remove(color)
+      tmp_code - [color]
     else
       pins << 'No'
     end
