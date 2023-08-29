@@ -28,7 +28,7 @@ class Mastermind
 
   def ask_code_guess
     code_guess = []
-    until code_guess.lenght == 4
+    until code_guess.length == 4
       puts("Choose four colors between #{COLORS}, separated by space")
       puts('E.g. red red white white')
       code_guess = gets.chomp.downcase.split(' ')
