@@ -29,33 +29,42 @@ class Mastermind
   def ask_code_guess
     code_guess = []
     until code_guess.length == 4
-      puts("Choose four colors between #{COLORS}, separated by space")
-      puts('E.g. red red white white')
+      puts("Choose four colors between #{COLORS.join(', ')}, separated by space")
+      puts("E.g. red red white white\n\n")
       code_guess = gets.chomp.downcase.split(' ')
       return code_guess if code_guess.length == 4
 
-      puts('Please follow the instructions!')
+      puts("\nPlease follow the instructions!\n\n")
     end
   end
 
   def check_guess(code_guess)
-    pins = %w[]
+    pins = %w[No No No No]
     tmp_code = @code
-    code_guess.each_with_index do |color, index|
-      update_pins(color, index, code_guess, tmp_code, pins)
-    end
+    update_pins(code_guess, tmp_code, pins)
     pins
   end
 
-  def update_pins(color, index, code_guess, tmp_code, pins)
-    if code_guess[index] == tmp_code[index]
-      pins << 'Yes'
-      tmp_code - [code_guess[index]]
-    elsif tmp_code.include?(color)
-      pins << 'Kinda'
-      tmp_code - [color]
-    else
-      pins << 'No'
+  def update_pins(code_guess, tmp_code, pins)
+    check_perfect_match(code_guess, tmp_code, pins)
+    check_partial_match(code_guess, tmp_code, pins)
+  end
+
+  def check_perfect_match(code_guess, tmp_code, pins)
+    code_guess.each_with_index do |_color, index|
+      if code_guess[index] == tmp_code[index]
+        pins[index] = 'Yes'
+        tmp_code[index] = nil
+      end
+    end
+  end
+
+  def check_partial_match(code_guess, tmp_code, pins)
+    code_guess.each_with_index do |color, index|
+      if tmp_code.include?(color)
+        pins[index] = 'Kinda'
+        tmp_code[tmp_code.index(color)] = nil
+      end
     end
   end
 end
@@ -69,19 +78,7 @@ loop do
   game_over = game.game_over?(code_guess)
   return puts('Game Over: Codebreaker wins!') if game_over
 
-  puts(game.check_guess(code_guess))
+  puts("\n#{game.check_guess(code_guess).join(' ')}\n\n")
   game.advance_turn
   return puts('Game Over: Codemaker wins!') if game.turns.zero?
 end
-
-# Ask player colors 1-4
-# Check if guess is correct
-# If correct, game over
-# If not correct check if right color
-# If right color check if right position
-# If right position red pin + 1
-# If right color but not right position white pin + 1
-# If neither check next color
-# If no color end turn
-# If no more turns game over
-# If turns > 0 repeat
