@@ -5,10 +5,10 @@ TURNS = 12
 
 # Both the logic and the opponent of the game
 class Mastermind
-  attr_accessor :code
+  attr_accessor :code, :turns
 
   def initialize
-    @code = []
+    @code = %w[]
     @turns = TURNS
   end
 
@@ -37,6 +37,27 @@ class Mastermind
       puts('Please follow the instructions!')
     end
   end
+
+  def check_guess(code_guess)
+    pins = %w[]
+    tmp_code = @code
+    code_guess.each_with_index do |color, index|
+      update_pins(color, index, code_guess, tmp_code, pins)
+    end
+    pins
+  end
+
+  def update_pins(color, index, code_guess, tmp_code, pins)
+    if code_guess[index] == tmp_code[index]
+      pins << 'Yes'
+      tmp_code.remove(tmp_code[index])
+    elsif tmp_code.include?(color)
+      pins << 'Kinda'
+      tmp_code.remove(color)
+    else
+      pins << 'No'
+    end
+  end
 end
 
 # Game start
@@ -50,9 +71,7 @@ loop do
     return game.turns.zero? ? puts('Game Over: Codemaker wins!') : puts('Game Over: Codebreaker wins!')
   end
 
-  code_guess.each do |color|
-
-  end
+  game.check_guess
 end
 
 # Ask player colors 1-4
