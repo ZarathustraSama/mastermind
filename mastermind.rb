@@ -19,7 +19,7 @@ class Mastermind
   end
 
   def game_over?(code_guess)
-    code_guess == @code || @turns.zero?
+    code_guess == @code
   end
 
   def advance_turn
@@ -65,14 +65,13 @@ game = Mastermind.new
 game.choose_code
 
 loop do
-  game_over = game.game_over?(code_guess)
-  if game_over
-    return game.turns.zero? ? puts('Game Over: Codemaker wins!') : puts('Game Over: Codebreaker wins!')
-  end
-
   code_guess = game.ask_code_guess
+  game_over = game.game_over?(code_guess)
+  return puts('Game Over: Codebreaker wins!') if game_over
+
   puts(game.check_guess(code_guess))
   game.advance_turn
+  return puts('Game Over: Codemaker wins!') if game.turns.zero?
 end
 
 # Ask player colors 1-4
