@@ -13,7 +13,7 @@ class Mastermind
   end
 
   def choose_code
-    0..3.each do
+    4.times do
       @code << COLORS.sample
     end
   end
