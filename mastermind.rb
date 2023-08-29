@@ -65,13 +65,14 @@ game = Mastermind.new
 game.choose_code
 
 loop do
-  code_guess = game.ask_code_guess
   game_over = game.game_over?(code_guess)
   if game_over
     return game.turns.zero? ? puts('Game Over: Codemaker wins!') : puts('Game Over: Codebreaker wins!')
   end
 
-  game.check_guess
+  code_guess = game.ask_code_guess
+  puts(game.check_guess(code_guess))
+  game.advance_turn
 end
 
 # Ask player colors 1-4
