@@ -32,7 +32,7 @@ class Mastermind
       puts("Choose four colors between #{COLORS}, separated by space")
       puts('E.g. red red white white')
       code_guess = gets.chomp.downcase.split(' ')
-      return code_guess if code_guess.lenght == 4
+      return code_guess if code_guess.length == 4
 
       puts('Please follow the instructions!')
     end
