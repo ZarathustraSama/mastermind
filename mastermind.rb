@@ -26,18 +26,6 @@ class Mastermind
     @turns -= 1
   end
 
-  def ask_code_guess
-    code_guess = []
-    until code_guess.length == 4
-      puts("Choose four colors between #{COLORS.join(', ')}, separated by space")
-      puts("E.g. red red white white\n\n")
-      code_guess = gets.chomp.downcase.split(' ')
-      return code_guess if code_guess.length == 4
-
-      puts("\nPlease follow the instructions!\n\n")
-    end
-  end
-
   def check_guess(code_guess)
     pins = %w[No No No No]
     tmp_code = @code.clone
@@ -69,12 +57,32 @@ class Mastermind
   end
 end
 
+# Everything that handles user input
+class Player
+  def ask_code_guess
+    code_guess = []
+    loop do
+      puts("Choose four colors between #{COLORS.join(', ')}, separated by space\nE.g. red red white white\n\n")
+      code_guess = gets.chomp.downcase.split(' ')
+      return code_guess if code_guess.all? { |color| correct_color?(color) } && code_guess.length == 4
+
+      puts("\nPlease follow the instructions!\n\n")
+    end
+  end
+
+  def correct_color?(color)
+    COLORS.include?(color) ? true : false
+  end
+end
+
 # Game start
 game = Mastermind.new
+player = Player.new
+
 game.choose_code
 
 loop do
-  code_guess = game.ask_code_guess
+  code_guess = player.ask_code_guess
   game_over = game.game_over?(code_guess)
   return puts("\nGame Over: Codebreaker wins!") if game_over
 
