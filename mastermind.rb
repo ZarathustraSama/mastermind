@@ -40,7 +40,7 @@ class Mastermind
 
   def check_guess(code_guess)
     pins = %w[No No No No]
-    tmp_code = @code
+    tmp_code = @code.clone
     update_pins(code_guess, tmp_code, pins)
     pins
   end
@@ -76,9 +76,9 @@ game.choose_code
 loop do
   code_guess = game.ask_code_guess
   game_over = game.game_over?(code_guess)
-  return puts('Game Over: Codebreaker wins!') if game_over
+  return puts("\nGame Over: Codebreaker wins!") if game_over
 
   puts("\n#{game.check_guess(code_guess).join(' ')}\n\n")
   game.advance_turn
-  return puts('Game Over: Codemaker wins!') if game.turns.zero?
+  return puts("\nGame Over: Codemaker wins!") if game.turns.zero?
 end
