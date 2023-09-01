@@ -13,9 +13,7 @@ class Mastermind
   end
 
   def choose_code
-    4.times do
-      @code << COLORS.sample
-    end
+    4.times { @code << COLORS.sample }
   end
 
   def game_over?(code_guess)
@@ -27,7 +25,7 @@ class Mastermind
   end
 
   def check_guess(code_guess)
-    pins = %w[No No No No]
+    pins = { Yes: 0, Kinda: 0 }
     tmp_code = @code.clone
     update_pins(code_guess, tmp_code, pins)
     pins
@@ -41,30 +39,37 @@ class Mastermind
   def check_perfect_match(code_guess, tmp_code, pins)
     code_guess.each_with_index do |_color, index|
       if code_guess[index] == tmp_code[index]
-        pins[index] = 'Yes'
+        pins[:Yes] += 1
         tmp_code[index] = nil
       end
     end
   end
 
   def check_partial_match(code_guess, tmp_code, pins)
-    code_guess.each_with_index do |color, index|
+    code_guess.each do |color|
       if tmp_code.include?(color)
-        pins[index] = 'Kinda'
+        pins[:Kinda] += 1
         tmp_code[tmp_code.index(color)] = nil
       end
     end
+  end
+
+  def create_all_sets
+    COLORS.product(COLORS, COLORS, COLORS)
+  end
+
+  def break_code
+    initial_guess = %w[red red green green]
   end
 end
 
 # Everything that handles user input
 class Player
-  def ask_code_guess
-    code_guess = []
+  def ask_code
     loop do
-      puts("Choose four colors between #{COLORS.join(', ')}, separated by space\nE.g. red red white white\n\n")
-      code_guess = gets.chomp.downcase.split(' ')
-      return code_guess if code_guess.all? { |color| correct_color?(color) } && code_guess.length == 4
+      puts("Choose four colors between #{COLORS.join(', ')}, separated by space\nE.g. red red green green\n\n")
+      code = gets.chomp.downcase.split(' ')
+      return code if code.all? { |color| correct_color?(color) } && code.length == 4
 
       puts("\nPlease follow the instructions!\n\n")
     end
@@ -73,20 +78,38 @@ class Player
   def correct_color?(color)
     COLORS.include?(color) ? true : false
   end
+
+  def code_maker?
+    loop do
+      puts("Do you want to be the codemaker or the codebreaker?\n\n")
+      choice = gets.chomp.downcase
+      if choice == 'codemaker'
+        return true
+      elsif choice == 'codebreaker'
+        return false
+      end
+
+      puts("\nPick a side!")
+    end
+  end
 end
 
 # Game start
 game = Mastermind.new
 player = Player.new
 
-game.choose_code
+if player.code_maker?
+  game.code = player.ask_code
+  game.break_code
+else
+  game.choose_code
+  loop do
+    code_guess = player.ask_code
+    return puts("\nGame Over: Codebreaker wins!") if game.game_over?(code_guess)
 
-loop do
-  code_guess = player.ask_code_guess
-  game_over = game.game_over?(code_guess)
-  return puts("\nGame Over: Codebreaker wins!") if game_over
-
-  puts("\n#{game.check_guess(code_guess).join(' ')}\n\n")
-  game.advance_turn
-  return puts("\nGame Over: Codemaker wins!") if game.turns.zero?
+    pins = game.check_guess(code_guess)
+    puts("\nYes: #{pins[:Yes]}, Kinda: #{pins[:Kinda]}\n\n")
+    game.advance_turn
+    return puts("\nGame Over: Codemaker wins!") if game.turns.zero?
+  end
 end
