@@ -3,7 +3,7 @@
 COLORS = %w[red green blue yellow white purple].freeze
 TURNS = 12
 
-# Both the logic and the opponent of the game
+# The logic of the game
 class Mastermind
   attr_accessor :code, :turns
 
@@ -24,16 +24,16 @@ class Mastermind
     @turns -= 1
   end
 
-  def check_guess(code_guess)
+  def check_guess(code_guess, code = @code.clone)
     pins = { Yes: 0, Kinda: 0 }
-    tmp_code = @code.clone
-    update_pins(code_guess, tmp_code, pins)
-    pins
+    update_pins(code_guess, code, pins)
   end
 
   def update_pins(code_guess, tmp_code, pins)
+    tmp_code = tmp_code.clone
     check_perfect_match(code_guess, tmp_code, pins)
     check_partial_match(code_guess, tmp_code, pins)
+    pins
   end
 
   def check_perfect_match(code_guess, tmp_code, pins)
@@ -52,14 +52,6 @@ class Mastermind
         tmp_code[tmp_code.index(color)] = nil
       end
     end
-  end
-
-  def create_all_sets
-    COLORS.product(COLORS, COLORS, COLORS)
-  end
-
-  def break_code
-    initial_guess = %w[red red green green]
   end
 end
 
@@ -94,16 +86,40 @@ class Player
   end
 end
 
+# Used when the computer is the guesser
+class Computer
+  attr_accessor :all_codes, :code_guess
+
+  def initialize
+    @all_codes = COLORS.product(COLORS, COLORS, COLORS)
+    @code_guess = %w[red red green green]
+  end
+end
+
 # Game start
 game = Mastermind.new
 player = Player.new
 
 if player.code_maker?
+  cpu = Computer.new
   game.code = player.ask_code
-  game.break_code
+  puts("\nNow Guessing...\n")
+
+  loop do
+    puts("#{game.turns} Turn(s) left")
+    pins = game.check_guess(cpu.code_guess)
+    puts("\n#{cpu.code_guess.join(', ')}\n\nYes: #{pins[:Yes]}, Kinda: #{pins[:Kinda]}\n\n")
+    return puts('Game Over: Codebreaker wins!') if game.game_over?(cpu.code_guess)
+
+    cpu.all_codes.select! { |set| game.check_guess(cpu.code_guess, set) == pins }
+    cpu.code_guess = cpu.all_codes[0]
+    game.advance_turn
+    return puts("\nGame Over: Codemaker wins!") if game.turns.zero?
+  end
 else
   game.choose_code
   loop do
+    puts("#{game.turns} Turn(s) left")
     code_guess = player.ask_code
     return puts("\nGame Over: Codebreaker wins!") if game.game_over?(code_guess)
 
